@@ -1,4 +1,4 @@
-﻿describe('ESTADO Y RENDIMIENTO', () => {
+describe('ESTADO Y RENDIMIENTO', () => {
   test('debe manejar estado de autenticacion globalmente', () => {
     const authState = {
       user: { id: 1, username: 'admin', rol: 'admin' },

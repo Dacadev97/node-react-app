@@ -1,4 +1,4 @@
-﻿import { render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 
 describe("COMPONENTES REACT", () => {
   test("debe renderizar estadisticas sin limite de paginacion", () => {

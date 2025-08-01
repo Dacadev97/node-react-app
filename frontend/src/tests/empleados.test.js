@@ -1,4 +1,4 @@
-﻿describe("👥 OPERACIONES CRUD - EMPLEADOS", () => {
+describe("👥 OPERACIONES CRUD - EMPLEADOS", () => {
   describe("📋 Consulta de empleados", () => {
     test("debe validar operaciones de consulta", () => {
       const empleados = [

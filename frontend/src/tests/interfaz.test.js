@@ -1,4 +1,4 @@
-﻿describe("INTERFAZ DE USUARIO", () => {
+describe("INTERFAZ DE USUARIO", () => {
   describe("Dashboard y visualización", () => {
     test("debe mostrar estadísticas sin límites de paginación", () => {
       const stats = {

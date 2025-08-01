@@ -1,4 +1,4 @@
-﻿describe("AUTENTICACIÓN Y AUTORIZACIÓN", () => {
+describe("AUTENTICACIÓN Y AUTORIZACIÓN", () => {
   describe("Funcionalidades básicas de autenticación", () => {
     test("debe ejecutar pruebas de autenticación", () => {
       expect(true).toBe(true);

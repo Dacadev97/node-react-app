@@ -136,7 +136,7 @@ const Dashboard = () => {
       <DashboardContainer>
         <Navbar />
         <Content>
-          <Loading text="Cargando estadísticas..." />
+          <Loading text="Cargando estadí­sticas..." />
         </Content>
       </DashboardContainer>
     );
@@ -170,7 +170,7 @@ const Dashboard = () => {
 
         {error && (
           <ErrorMessage>
-            Error al cargar estadísticas: {error}
+            Error al cargar estadí­sticas: {error}
             <button onClick={() => window.location.reload()}>Reintentar</button>
           </ErrorMessage>
         )}

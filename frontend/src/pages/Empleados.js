@@ -455,7 +455,7 @@ const Empleados = () => {
                 <h3>
                   {editingEmpleado ? "Editar Empleado" : "Nuevo Empleado"}
                 </h3>
-                <CloseButton onClick={handleCloseForm}>×</CloseButton>
+                <CloseButton onClick={handleCloseForm}>í—</CloseButton>
               </ModalHeader>
               <Suspense fallback={<Loading text="Cargando formulario..." />}>
                 <EmpleadoForm
