@@ -322,7 +322,7 @@ npm start
 
 ```javascript
 {
-  email: "admin@konecta.com",
+  username: "admin",
   password: "admin123",
   rol: "administrador",
   permisos: "CRUD completo en empleados y solicitudes"
@@ -333,7 +333,7 @@ npm start
 
 ```javascript
 {
-  email: "empleado@konecta.com",
+  username: "empleado", 
   password: "empleado123",
   rol: "empleado",
   permisos: "Solo lectura en empleados, CRUD en solicitudes"
@@ -388,7 +388,7 @@ Content-Type: application/json
 POST /auth/login
 Content-Type: application/json
 {
-  "email": "admin@konecta.com",
+  "username": "admin",
   "password": "admin123"
 }
 Response: {
