@@ -1,0 +1,71 @@
+services:
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: konecta-postgres
+    environment:
+      POSTGRES_DB: konecta
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/database.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - konecta-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: konecta-backend
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: konecta
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      JWT_SECRET: your_production_jwt_secret_here_change_in_production
+      JWT_EXPIRES_IN: 7d
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - konecta-network
+    volumes:
+      - ./backend:/usr/src/app
+      - /usr/src/app/node_modules
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: konecta-frontend
+    environment:
+      REACT_APP_API_URL: http://localhost:3001/api/v1
+    ports:
+      - "3000:80"
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - konecta-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  konecta-network:
+    driver: bridge

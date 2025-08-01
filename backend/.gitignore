@@ -1,0 +1,14 @@
+node_modules/
+.env
+coverage/
+*.log
+.DS_Store
+dist/
+build/
+temp/
+tmp/
+*.tmp
+*.bak
+*_old.*
+*_new.*
+config/config.json
