@@ -15,10 +15,14 @@ app.use(helmet());
 
 app.use(
   cors({
-    origin:
-      process.env.NODE_ENV === "production"
-        ? ["http://localhost:3000"]
-        : ["http://localhost:3000", "http://127.0.0.1:3000"],
+    origin: function (origin, callback) {
+      // Permitir peticiones sin origin (como aplicaciones móviles) o desde localhost
+      if (!origin || /^https?:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("No permitido por CORS"));
+      }
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],

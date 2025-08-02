@@ -606,10 +606,9 @@ El proyecto incluye containerización completa con Docker Compose para desarroll
 
 #### Servicios Incluidos:
 
-- **PostgreSQL**: Base de datos con persistencia
-- **Backend**: API Node.js/Express
-- **Frontend**: Aplicación React con Nginx
-- **Redis** (opcional): Cache y sesiones
+- **PostgreSQL**: Base de datos con persistencia (puerto 5432)
+- **Backend**: API Node.js/Express (puerto 3001)
+- **Frontend**: Aplicación React con Nginx (puerto 3033)
 
 ### Archivos Docker
 
@@ -620,66 +619,139 @@ version: "3.8"
 services:
   postgres:
     image: postgres:15-alpine
+    container_name: konecta-postgres
     environment:
-      POSTGRES_DB: konecta_db
+      POSTGRES_DB: konecta
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - konecta-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   backend:
-    build: ./backend
-    ports:
-      - "5000:5000"
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: konecta-backend
     environment:
-      - NODE_ENV=development
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/konecta_db
+      NODE_ENV: production
+      PORT: 3001
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: konecta
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      JWT_SECRET: your_production_jwt_secret_here_change_in_production
+      JWT_EXPIRES_IN: 7d
+    ports:
+      - "3001:3001"
     depends_on:
-      - postgres
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
+      postgres:
+        condition: service_healthy
+    networks:
+      - konecta-network
+    restart: unless-stopped
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: konecta-frontend
+    environment:
+      REACT_APP_API_URL: http://localhost:3001/api/v1
     ports:
-      - "3000:80"
+      - "3033:3000"
     depends_on:
       - backend
-    volumes:
-      - ./frontend/nginx.conf:/etc/nginx/nginx.conf
+    networks:
+      - konecta-network
+    restart: unless-stopped
 
 volumes:
   postgres_data:
+
+networks:
+  konecta-network:
+    driver: bridge
 ```
 
 ### Comandos Docker
 
 ```bash
-# Construcción y inicio
+# Construcción y inicio completo
 docker-compose up --build -d
+
+# Ver estado de todos los contenedores
+docker-compose ps
 
 # Ver logs de todos los servicios
 docker-compose logs -f
 
 # Ver logs de un servicio específico
-docker-compose logs -f backend
+docker-compose logs -f konecta-backend
+docker-compose logs -f konecta-frontend
+docker-compose logs -f konecta-postgres
 
 # Ejecutar comandos en contenedores
-docker-compose exec backend npm test
-docker-compose exec postgres psql -U postgres -d konecta_db
+docker-compose exec konecta-backend sh
+docker-compose exec konecta-postgres psql -U postgres -d konecta
 
 # Reiniciar servicios
-docker-compose restart backend
+docker-compose restart konecta-backend
+docker-compose restart konecta-frontend
 
-# Limpiar y reconstruir
+# Limpiar y reconstruir completamente
 docker-compose down -v
-docker-compose up --build
+docker-compose up --build -d
 
-# Escalar servicios (desarrollo)
-docker-compose up --scale backend=2
+# Verificar health checks
+docker-compose ps | grep healthy
+```
+
+### Acceso a la Aplicación Dockerizada
+
+Una vez iniciados los contenedores:
+
+- **Frontend**: http://localhost:3033
+- **Backend API**: http://localhost:3001/api/v1
+- **Base de Datos**: localhost:5432 (usuario: postgres, password: postgres)
+
+### Credenciales de Acceso
+
+- **Administrador**: 
+  - Usuario: `admin`
+  - Contraseña: `admin123`
+
+- **Empleado**: 
+  - Usuario: `empleado`  
+  - Contraseña: `empleado123`
+
+### Troubleshooting Docker
+
+```bash
+# Si hay problemas de puerto, verificar puertos en uso
+netstat -aon | findstr :3033
+netstat -aon | findstr :3001
+netstat -aon | findstr :5432
+
+# Verificar logs detallados
+docker-compose logs --details konecta-backend
+docker-compose logs --details konecta-frontend
+
+# Reconstruir solo un servicio
+docker-compose up --build konecta-frontend
+
+# Verificar conectividad entre contenedores
+docker-compose exec konecta-backend ping postgres
+docker-compose exec konecta-frontend ping konecta-backend
 ```
 
 ## 📊 Estado del Proyecto

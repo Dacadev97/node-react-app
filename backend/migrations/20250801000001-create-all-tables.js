@@ -2,6 +2,7 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
+    // Crear tabla usuarios
     await queryInterface.createTable("usuarios", {
       id: {
         allowNull: false,
@@ -45,6 +46,7 @@ module.exports = {
       },
     });
 
+    // Crear tabla empleados
     await queryInterface.createTable("empleados", {
       id: {
         allowNull: false,
@@ -64,8 +66,24 @@ module.exports = {
         type: Sequelize.DECIMAL(10, 2),
         allowNull: false,
       },
+      activo: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
+      },
+      fecha_creacion: {
+        allowNull: false,
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
+      },
+      fecha_actualizacion: {
+        allowNull: false,
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
+      },
     });
 
+    // Crear tabla solicitudes
     await queryInterface.createTable("solicitudes", {
       id: {
         allowNull: false,
@@ -86,7 +104,7 @@ module.exports = {
         type: Sequelize.STRING(255),
         allowNull: false,
       },
-      id_empleado: {
+      empleado_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
@@ -94,14 +112,26 @@ module.exports = {
           key: "id",
         },
         onUpdate: "CASCADE",
-        onDelete: "CASCADE",
+        onDelete: "RESTRICT",
       },
       fecha_creacion: {
         allowNull: false,
         type: Sequelize.DATE,
         defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
       },
+      fecha_actualizacion: {
+        allowNull: false,
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
+      },
     });
+
+    // Crear índices para mejorar rendimiento
+    await queryInterface.addIndex("usuarios", ["email"]);
+    await queryInterface.addIndex("usuarios", ["username"]);
+    await queryInterface.addIndex("empleados", ["activo"]);
+    await queryInterface.addIndex("solicitudes", ["codigo"]);
+    await queryInterface.addIndex("solicitudes", ["empleado_id"]);
   },
 
   async down(queryInterface, Sequelize) {
