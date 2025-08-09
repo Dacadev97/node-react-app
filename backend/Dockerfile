@@ -1,4 +1,4 @@
-FROM node:18-alpine
+FROM node:current-alpine3.22
 
 # Instalar netcat para verificar la conexión de PostgreSQL
 RUN apk add --no-cache netcat-openbsd
