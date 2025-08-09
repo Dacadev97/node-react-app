@@ -1,5 +1,3 @@
-#!/bin/sh
-
 echo "Esperando a PostgreSQL..."
 
 # Esperar a que PostgreSQL esté disponible
